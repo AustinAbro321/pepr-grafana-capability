@@ -1,0 +1,130 @@
+{
+  "id": 10,
+  "uid": "11ZwmB1UkSz11111",
+  "folderUID": "Up8gh-kSz",
+  "orgID": 1,
+  "ruleGroup": "grafana",
+  "title": "80% of CPU Limit Used by Containers (Over Time)",
+  "condition": "C",
+  "data": [
+    {
+      "refId": "A",
+      "queryType": "",
+      "relativeTimeRange": {
+        "from": 21600,
+        "to": 0
+      },
+      "datasourceUid": "prometheus",
+      "model": {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "editorMode": "code",
+        "exemplar": true,
+        "expr": "(sum(rate(container_cpu_usage_seconds_total{namespace=~\"hello-world-dev\",container!=\"POD\",container!=\"istio-proxy\"}[5m])) by (namespace,container) / sum(kube_pod_container_resource_limits{resource=\"cpu\",namespace=~\"hello-world-dev\",container!=\"POD\",container!=\"istio-proxy\"}) by (namespace,container) ) * 100",
+        "interval": "",
+        "intervalMs": 30000,
+        "legendFormat": "{container:{{container}}, pod:{{pod}}, namespace:{{namespace}} }",
+        "maxDataPoints": 43200,
+        "range": true,
+        "refId": "A"
+      }
+    },
+    {
+      "refId": "B",
+      "queryType": "",
+      "relativeTimeRange": {
+        "from": 21600,
+        "to": 0
+      },
+      "datasourceUid": "-100",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "B"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "type": "__expr__",
+          "uid": "-100"
+        },
+        "expression": "A",
+        "hide": false,
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "reducer": "last",
+        "refId": "B",
+        "type": "reduce"
+      }
+    },
+    {
+      "refId": "C",
+      "queryType": "",
+      "relativeTimeRange": {
+        "from": 21600,
+        "to": 0
+      },
+      "datasourceUid": "-100",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                80
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "C"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "type": "__expr__",
+          "uid": "-100"
+        },
+        "expression": "B",
+        "hide": false,
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "refId": "C",
+        "type": "threshold"
+      }
+    }
+  ],
+  "updated": "2023-09-06T17:41:40Z",
+  "noDataState": "NoData",
+  "execErrState": "Error",
+  "for": "5m",
+  "annotations": {
+    "__dashboardUid__": "UTgkvtNVk15",
+    "__panelId__": "2"
+  }
+}
