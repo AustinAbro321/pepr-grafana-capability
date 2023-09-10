@@ -167,3 +167,9 @@ When(a.Namespace)
   .Mutate(async change => {
     //applesauce(change.Raw.metadata.name)
   });  
+
+
+
+export function sum(a, b) {
+  return a + b;
+}
