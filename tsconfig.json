@@ -18,5 +18,5 @@
     "useUnknownInCatchVariables": false
   },
   "include": [
-    "**/*.ts", "jest.config.js"  ]
+    "**/*.ts", "jest.config.js",]
 }

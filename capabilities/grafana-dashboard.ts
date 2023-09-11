@@ -2,10 +2,13 @@ import {
   Capability,
   a,
   fetch,
+  PeprMutateRequest,
+  Log,
 } from "pepr";
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { FetchResponse } from "pepr/dist/lib/fetch";
 
 const grafanaAPIKey = "eyJrIjoiWDVqdk8wM1hwaDVtNHBQam40dEhUb3BZdVlTb1pKeFciLCJuIjoiYWRtaW4iLCJpZCI6MX0="
 
@@ -16,14 +19,6 @@ export const HelloPepr = new Capability({
 });
 
 const { When } = HelloPepr;
-
-interface GrafanaReturn {
-  id: string;
-  slug: string;
-  version: string;
-  url: string;
-  uid: string;
-}
 
 function generateRandomString(length: number): string {
   let result = '';
@@ -44,14 +39,16 @@ function getJsonFile(filename: string): any {
 
 }
 
-async function createFolder(namespaceName: string) {
-  const folderJson = getJsonFile("folder.json")
-  const folderUid = generateRandomString(12)
-  folderJson.title = `${namespaceName}`
-  folderJson.Uid = folderUid
-  const folderJsonString = JSON.stringify(folderJson);
+interface GrafanaReturn {
+  id: string;
+  slug: string;
+  version: string;
+  url: string;
+  uid: string;
+}
 
-  const folderResponse = await fetch<GrafanaReturn>(
+export async function createFolderGrafanaApi(body: string){
+  return fetch<GrafanaFolderData>(
     "https://grafana.bigbang.dev/api/folders",
     { 
       method: 'POST', 
@@ -59,11 +56,49 @@ async function createFolder(namespaceName: string) {
         'Authorization': `Bearer ${grafanaAPIKey}`,
         'Content-Type': 'application/json',
       },
-      body: folderJsonString
+      body: body
     }
   );
-  console.log("folder response")
+}
+
+interface GrafanaFolderData {
+  id: number;
+  uid: string;
+  title: string;
+}
+
+type GrafanaFolderDataArr = GrafanaFolderData[]
+
+export async function getFoldersGrafanaApi(){
+  return fetch<GrafanaFolderDataArr>(
+    "https://grafana.bigbang.dev/api/folders",
+    { 
+      method: 'GET', 
+      headers: {
+        'Authorization': `Bearer ${grafanaAPIKey}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+}
+
+export async function createFolder(namespaceName: string, createFolderApiCall: Function,
+  getFoldersApiCall: Function) : Promise<string> {
+  const folderJson = getJsonFile("folder.json")
+  const folderUid = generateRandomString(12)
+  folderJson.title = `${namespaceName}`
+  folderJson.Uid = folderUid
+
+  const folderJsonString = JSON.stringify(folderJson);
+  const folderResponse = await createFolderApiCall(folderJsonString);
   console.log(folderResponse)
+
+  if (folderResponse.statusText == 'Conflict'){
+    const getFolderResponse: FetchResponse<GrafanaFolderDataArr> = await getFoldersApiCall()
+    const correctFolder = getFolderResponse.data.find(entry => entry.title === folderJson.title)
+    return correctFolder.uid
+  }
+  return folderResponse.data.uid;
 }
 
 
@@ -91,14 +126,15 @@ async function createFolder(namespaceName: string) {
 // }
 
 
-async function applesauce(namespaceName: string) {
+async function applesauce(namespace: PeprMutateRequest<a.Namespace>) {
   const metricJsonPath = path.join(__dirname, "..", 'metric.json');
   const metricData = fs.readFileSync(metricJsonPath, 'utf8');
   const metricJson = JSON.parse(metricData);
   // Future enhancement get the number of namespaces with the same team or same dashboard enabled
   // Then add that to the dashboard
   // Future enhancement have the field to trigger this be pepr.io/grafana_app_name titles are based on that
-  createFolder(namespaceName);
+  const namespaceName = namespace.Raw.metadata.name
+  const folderUid = createFolder(namespaceName,createFolderGrafanaApi,getFoldersGrafanaApi);
   const dashboardUid = generateRandomString(12)
 
   metricJson.dashboard.templating.list[0].allValue = namespaceName;
@@ -165,11 +201,5 @@ When(a.Namespace)
   .IsCreatedOrUpdated()
   .WithLabel("pepr.io/create-grafana-dashboard")
   .Mutate(async change => {
-    //applesauce(change.Raw.metadata.name)
+    applesauce(change)
   });  
-
-
-
-export function sum(a, b) {
-  return a + b;
-}
