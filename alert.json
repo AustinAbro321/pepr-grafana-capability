@@ -1,7 +1,7 @@
 {
-  "id": 10,
+  "id": 1,
   "uid": "11ZwmB1UkSz11111",
-  "folderUID": "Up8gh-kSz",
+  "folderUID": "example",
   "orgID": 1,
   "ruleGroup": "grafana",
   "title": "80% of CPU Limit Used by Containers (Over Time)",
@@ -124,7 +124,7 @@
   "execErrState": "Error",
   "for": "5m",
   "annotations": {
-    "__dashboardUid__": "UTgkvtNVk15",
+    "__dashboardUid__": "example-uid",
     "__panelId__": "2"
   }
 }

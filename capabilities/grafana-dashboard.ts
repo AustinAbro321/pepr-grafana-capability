@@ -101,7 +101,7 @@ interface GrafanaDashboardReturn {
   uid: string;
 }
 
-async function createDashboardGrafanaApi(jsonBody: string){
+export async function createDashboardGrafanaApi(jsonBody: string){
   return fetch<GrafanaDashboardReturn>(
     "https://grafana.bigbang.dev/api/dashboards/db",
     { 
@@ -139,18 +139,18 @@ export async function createDashboard(namespaceName: string,folderUid: string,
 
 
 
-async function createAlert(dashboardUid: string){
+export async function createAlert(dashboardUid: string,folderUid: string){
   const alertJson = getJsonFile("alert.json")
 
   const alertUid = generateRandomString(12);
-  // alertJson.annotations.__dashboardUid__ = dashboardUid;
-  // alertJson.uid = alertUid;
+  alertJson.annotations.__dashboardUid__ = dashboardUid;
+  alertJson.uid = alertUid;
+  alertJson.folderUID = folderUid;
 
   const alertJsonString = JSON.stringify(alertJson);
-
-  //TODO I"M stupid and this is the wrong API request, why I need better testing
+  
   const alertResponse = await fetch<GrafanaDashboardReturn>(
-    "https://grafana.bigbang.dev/api/dashboards/db",
+    "https://grafana.bigbang.dev/api/v1/provisioning/alert-rules/",
     { 
       method: 'POST', 
       headers: {
@@ -166,19 +166,11 @@ async function createAlert(dashboardUid: string){
 }
 
 
-async function applesauce(namespace: PeprMutateRequest<a.Namespace>) {
-
-  const namespaceName = namespace.Raw.metadata.name
-  const folderUid = await createFolder(namespaceName,createFolderGrafanaApi,getFoldersGrafanaApi);
-  createDashboard(namespaceName,folderUid,createDashboardGrafanaApi);
-  
-}
-
-  
-
 When(a.Namespace)
   .IsCreatedOrUpdated()
   .WithLabel("pepr.io/create-grafana-dashboard")
   .Mutate(async change => {
-    applesauce(change)
+    const namespaceName = change.Raw.metadata.name
+    const folderUid = await createFolder(namespaceName,createFolderGrafanaApi,getFoldersGrafanaApi);
+    createDashboard(namespaceName,folderUid,createDashboardGrafanaApi);
   });  
