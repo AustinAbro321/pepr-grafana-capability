@@ -3,7 +3,7 @@ import { PeprModule } from "pepr";
 import cfg from "./package.json";
 
 // HelloPepr is a demo capability that is included with Pepr. Comment or delete the line below to remove it.
-import { HelloPepr } from "./capabilities/grafana-dashboard";
+import { Grafana } from "./capabilities/grafana-dashboard";
 
 /**
  * This is the main entrypoint for this Pepr module. It is run when the module is started.
@@ -11,7 +11,7 @@ import { HelloPepr } from "./capabilities/grafana-dashboard";
  */
 new PeprModule(cfg, [
   // "HelloPepr" is a demo capability that is included with Pepr. Comment or delete the line below to remove it.
-  HelloPepr,
+  Grafana,
 
   // Your additional capabilities go here
 ]);

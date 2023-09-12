@@ -2,23 +2,35 @@ import {
   Capability,
   a,
   fetch,
-  PeprMutateRequest,
-  Log,
+  k8s,
 } from "pepr";
 
+import { Buffer } from "buffer";
 import * as fs from 'fs';
 import * as path from 'path';
 import { FetchResponse } from "pepr/dist/lib/fetch";
 
-const grafanaAPIKey = "eyJrIjoiWDVqdk8wM1hwaDVtNHBQam40dEhUb3BZdVlTb1pKeFciLCJuIjoiYWRtaW4iLCJpZCI6MX0="
 
-export const HelloPepr = new Capability({
-  name: "hello-pepr",
-  description: "A simple example capability to show how things work.",
-  namespaces: ["pepr-demo","hello-world-dev"]
+export const Grafana = new Capability({
+  name: "grafana",
+  description: "A simple example capability to show how things work."
 });
 
-const { When } = HelloPepr;
+const { When } = Grafana;
+const decode = (str: string):string => Buffer.from(str, 'base64').toString('binary');
+
+
+export async function getGrafanaApiKey() : Promise<string> {
+  //Future enhancement could be creating api key on the fly if the API allows it
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+  const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
+  
+  const response = await k8sCoreApi.readNamespacedSecret("grafana-admin-api-key","admin-ns-devs-do-not-access");
+  const v1Secret = response.body;
+  console.log(decode(response.body.data.value))
+  return decode(response.body.data.value)
+}
 
 function generateRandomString(length: number): string {
   let result = '';
@@ -40,12 +52,13 @@ function getJsonFile(filename: string): any {
 }
 
 export async function createFolderGrafanaApi(body: string){
+  const apiKey = await getGrafanaApiKey();
   return fetch<GrafanaFolderData>(
     "https://grafana.bigbang.dev/api/folders",
     { 
       method: 'POST', 
       headers: {
-        'Authorization': `Bearer ${grafanaAPIKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: body
@@ -62,12 +75,13 @@ interface GrafanaFolderData {
 type GrafanaFolderDataArr = GrafanaFolderData[]
 
 export async function getFoldersGrafanaApi(){
+  const apiKey = await getGrafanaApiKey();
   return fetch<GrafanaFolderDataArr>(
     "https://grafana.bigbang.dev/api/folders",
     { 
       method: 'GET', 
       headers: {
-        'Authorization': `Bearer ${grafanaAPIKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
     }
@@ -83,9 +97,12 @@ export async function createFolder(namespaceName: string, createFolderApiCall: F
 
   const folderJsonString = JSON.stringify(folderJson);
   const folderResponse = await createFolderApiCall(folderJsonString);
+  console.log(`This is the folder response`)
   console.log(folderResponse)
 
   if (folderResponse.statusText == 'Conflict'){
+    console.log("here")
+    //demo point
     const getFolderResponse: FetchResponse<GrafanaFolderDataArr> = await getFoldersApiCall()
     const correctFolder = getFolderResponse.data.find(entry => entry.title === folderJson.title)
     return correctFolder.uid
@@ -102,12 +119,13 @@ interface GrafanaDashboardReturn {
 }
 
 export async function createDashboardGrafanaApi(jsonBody: string){
+  const apiKey = await getGrafanaApiKey();
   return fetch<GrafanaDashboardReturn>(
     "https://grafana.bigbang.dev/api/dashboards/db",
     { 
       method: 'POST', 
       headers: {
-        'Authorization': `Bearer ${grafanaAPIKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: jsonBody
@@ -134,6 +152,9 @@ export async function createDashboard(namespaceName: string,folderUid: string,
 
   const metricResponse = await callCreateDashboardApi(metricJsonString)
 
+  console.log("this is the metric response")
+  console.log(metricResponse)
+
   return metricResponse.data.uid
 }
 
@@ -148,13 +169,13 @@ export async function createAlert(dashboardUid: string,folderUid: string){
   alertJson.folderUID = folderUid;
 
   const alertJsonString = JSON.stringify(alertJson);
-  
+  const apiKey = await getGrafanaApiKey();
   const alertResponse = await fetch<GrafanaDashboardReturn>(
     "https://grafana.bigbang.dev/api/v1/provisioning/alert-rules/",
     { 
       method: 'POST', 
       headers: {
-        'Authorization': `Bearer ${grafanaAPIKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'x-disable-provenance': 'true',
       },
@@ -172,5 +193,6 @@ When(a.Namespace)
   .Mutate(async change => {
     const namespaceName = change.Raw.metadata.name
     const folderUid = await createFolder(namespaceName,createFolderGrafanaApi,getFoldersGrafanaApi);
-    createDashboard(namespaceName,folderUid,createDashboardGrafanaApi);
-  });  
+    const dashboardUid = await createDashboard(namespaceName,folderUid,createDashboardGrafanaApi);
+    await createAlert(dashboardUid,folderUid)
+  });
