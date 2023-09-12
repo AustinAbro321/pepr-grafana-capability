@@ -27,8 +27,6 @@ export async function getGrafanaApiKey() : Promise<string> {
   const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
   
   const response = await k8sCoreApi.readNamespacedSecret("grafana-admin-api-key","admin-ns-devs-do-not-access");
-  const v1Secret = response.body;
-  console.log(decode(response.body.data.value))
   return decode(response.body.data.value)
 }
 

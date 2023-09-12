@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import {createFolder,createDashboard,createAlert,createDashboardGrafanaApi,getFoldersGrafanaApi} from './grafana-dashboard';
+import {createFolder,createDashboard} from './grafana-dashboard';
 
 
 function createFolderFakeApiCall() {
