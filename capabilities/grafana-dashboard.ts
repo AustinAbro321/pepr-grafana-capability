@@ -33,10 +33,9 @@ export async function getGrafanaApiKey() : Promise<string> {
 function generateRandomString(length: number): string {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
   
   for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
 
   return result;
@@ -46,7 +45,6 @@ function getJsonFile(filename: string): any {
   const jsonPath = path.join(__dirname, "..", filename);
   const jsonData = fs.readFileSync(jsonPath, 'utf8');
   return JSON.parse(jsonData);
-
 }
 
 export async function createFolderGrafanaApi(body: string){
