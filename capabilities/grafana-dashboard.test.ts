@@ -2,7 +2,7 @@ import { expect, test } from "@jest/globals";
 import {createFolder,createDashboard} from './grafana-dashboard';
 
 
-function createFolderFakeApiCall() {
+function getFoldersFakeApiCall() {
   return {
     data: [
       { id: 51, uid: 'nErXDvCkzz', title: 'example-team' },
@@ -32,11 +32,11 @@ function createFolderHappyPath(){
 }
 
 test('Create folder happy path', async () => {
-  expect(await createFolder("example-folder",createFolderHappyPath,createFolderFakeApiCall)).toBe("uid-we-want");
+  expect(await createFolder("example-folder",createFolderHappyPath,getFoldersFakeApiCall)).toBe("uid-we-want");
 });
 
 test('Create folder that already exists', async () => {
-  expect(await createFolder("example-folder",createFolderThatAlreadyExists,createFolderFakeApiCall)).toBe("uid-that-we-want");
+  expect(await createFolder("example-folder",createFolderThatAlreadyExists,getFoldersFakeApiCall)).toBe("uid-that-we-want");
 });
 
 const dashboardUid = 'dashboard-uid-we-want'

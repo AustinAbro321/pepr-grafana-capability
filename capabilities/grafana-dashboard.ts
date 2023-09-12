@@ -97,7 +97,6 @@ export async function createFolder(namespaceName: string, createFolderApiCall: F
   console.log(folderResponse)
 
   if (folderResponse.statusText == 'Conflict'){
-    //demo point
     const getFolderResponse: FetchResponse<GrafanaFolderDataArr> = await getFoldersApiCall()
     const correctFolder = getFolderResponse.data.find(entry => entry.title === folderJson.title)
     return correctFolder.uid
