@@ -43,7 +43,6 @@ export async function getGrafanaAuthHeader() : Promise<string> {
   const adminPassword = decode(response.body.data["admin-password"])
   const adminUsername = decode(response.body.data["admin-user"])
   const authHeader = "Basic " + encode(`${adminUsername}:${adminPassword}`)
-  console.log(authHeader)
   return authHeader
 }
 
@@ -62,21 +61,6 @@ function getJsonFile(filename: string): any {
   const jsonPath = path.join(__dirname, "..", filename);
   const jsonData = fs.readFileSync(jsonPath, 'utf8');
   return JSON.parse(jsonData);
-}
-
-export async function createFolderGrafanaApi(body: string){
-  const apiKey = await getGrafanaApiKey();
-  return fetch<GrafanaFolderData>(
-    "https://grafana.bigbang.dev/api/folders",
-    { 
-      method: 'POST', 
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: body
-    }
-  );
 }
 
 interface GrafanaFolderData {
@@ -100,8 +84,8 @@ export async function grafanaApiCall<T>(method: string, path: string, body: stri
         body: body
       }
     );
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${JSON.stringify(response)}`);
+    if (response.status == 403 || response.status == 401) {
+      throw new Error(`Auth error! Status: ${JSON.stringify(response)}`);
     }
     return response;
   }
@@ -110,38 +94,20 @@ export async function grafanaApiCall<T>(method: string, path: string, body: stri
   }
 }
 
-export async function getFoldersGrafanaApi(): Promise<FetchResponse<GrafanaFolderDataArr>> {
-  try{
-    return fetch<GrafanaFolderDataArr>(
-      "https://grafana.bigbang.dev/api/folders",
-      { 
-        method: 'GET', 
-        headers: {
-          'Authorization': `${await getGrafanaAuthHeader()}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-  }
-  catch (error) {
-    console.error('Error fetching data:', error);
-  }
-}
-
-export async function createFolder(namespaceName: string, createFolderApiCall: Function,
-  getFoldersApiCall: Function) : Promise<string> {
+export async function createFolder(namespaceName: string, createFolderApiCall: Function = grafanaApiCall<GrafanaFolderData>,
+  getFoldersApiCall: Function = grafanaApiCall<GrafanaFolderDataArr>) : Promise<string> {
   const folderJson = getJsonFile("folder.json")
   const folderUid = generateRandomString(12)
   folderJson.title = `${namespaceName}`
   folderJson.Uid = folderUid
 
   const folderJsonString = JSON.stringify(folderJson);
-  const folderResponse = await createFolderApiCall(folderJsonString);
+  const folderResponse = await createFolderApiCall("POST","api/folders",folderJsonString);
   console.log(`This is the folder response`)
   console.log(folderResponse)
 
   if (folderResponse.statusText == 'Conflict'){
-    const getFolderResponse: FetchResponse<GrafanaFolderDataArr> = await getFoldersApiCall()
+    const getFolderResponse: FetchResponse<GrafanaFolderDataArr> = await getFoldersApiCall("GET","api/folders")
     const correctFolder = getFolderResponse.data.find(entry => entry.title === folderJson.title)
     return correctFolder.uid
   }
@@ -230,7 +196,7 @@ When(a.Namespace)
   .WithLabel("pepr.io/create-grafana-dashboard")
   .Mutate(async change => {
     const namespaceName = change.Raw.metadata.name
-    const folderUid = await createFolder(namespaceName,createFolderGrafanaApi,getFoldersGrafanaApi);
+    const folderUid = await createFolder(namespaceName);
     const dashboardUid = await createDashboard(namespaceName,folderUid,createDashboardGrafanaApi);
     await createAlert(dashboardUid,folderUid)
   });

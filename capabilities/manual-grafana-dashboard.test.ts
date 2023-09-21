@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import {getGrafanaApiKey,createFolderGrafanaApi, getGrafanaAuthHeader, getFoldersGrafanaApi, grafanaApiCall, GrafanaFolderDataArr} from './grafana-dashboard';
+import {getGrafanaApiKey, getGrafanaAuthHeader, grafanaApiCall, GrafanaFolderDataArr, createFolder} from './grafana-dashboard';
 
 test("So I don't get an error when I run npm test lol", async () => {
   expect(true).toBe(true)
@@ -36,13 +36,13 @@ test("So I don't get an error when I run npm test lol", async () => {
 
 
 
-// test("get API key", async () => {
-//   console.log(await createFolderGrafanaApi("body"))
-// })
-
-test("generic grafana api call", async () => {
-  console.log(await grafanaApiCall<GrafanaFolderDataArr>("GET","api/folders"))
+test("get API key", async () => {
+  console.log(await createFolder("foldername"))
 })
+
+// test("generic grafana api call", async () => {
+//   console.log(await grafanaApiCall<GrafanaFolderDataArr>("GET","api/folders"))
+// })
 
 // test("get Folders", async () => {
 //   console.log(await getFoldersGrafanaApi())
