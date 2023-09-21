@@ -122,23 +122,8 @@ interface GrafanaDashboardReturn {
   uid: string;
 }
 
-export async function createDashboardGrafanaApi(jsonBody: string){
-  const apiKey = await getGrafanaApiKey();
-  return fetch<GrafanaDashboardReturn>(
-    "https://grafana.bigbang.dev/api/dashboards/db",
-    { 
-      method: 'POST', 
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: jsonBody
-    }
-  );
-}
-
 export async function createDashboard(namespaceName: string,folderUid: string,
-  callCreateDashboardApi) : Promise<string> {
+  callCreateDashboardApi: Function = grafanaApiCall<GrafanaFolderDataArr>) : Promise<string> {
   const metricJson = getJsonFile("metric.json")
   const dashboardUid = generateRandomString(12)
 
@@ -153,8 +138,7 @@ export async function createDashboard(namespaceName: string,folderUid: string,
   metricJson.dashboard.uid = dashboardUid;
 
   const metricJsonString = JSON.stringify(metricJson);
-
-  const metricResponse = await callCreateDashboardApi(metricJsonString)
+  const metricResponse = await callCreateDashboardApi("POST","api/dashboards/db",metricJsonString)
 
   console.log("this is the metric response")
   console.log(metricResponse)
@@ -173,20 +157,7 @@ export async function createAlert(dashboardUid: string,folderUid: string){
   alertJson.folderUID = folderUid;
 
   const alertJsonString = JSON.stringify(alertJson);
-  const apiKey = await getGrafanaApiKey();
-  const alertResponse = await fetch<GrafanaDashboardReturn>(
-    "https://grafana.bigbang.dev/api/v1/provisioning/alert-rules/",
-    { 
-      method: 'POST', 
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'x-disable-provenance': 'true',
-      },
-      body: alertJsonString
-    }
-  );
-  console.log("this is the response")
+  const alertResponse = await grafanaApiCall<GrafanaDashboardReturn>("POST","api/v1/provisioning/alert-rules/",alertJsonString)
   console.log(alertResponse)
 }
 
@@ -197,6 +168,6 @@ When(a.Namespace)
   .Mutate(async change => {
     const namespaceName = change.Raw.metadata.name
     const folderUid = await createFolder(namespaceName);
-    const dashboardUid = await createDashboard(namespaceName,folderUid,createDashboardGrafanaApi);
+    const dashboardUid = await createDashboard(namespaceName,folderUid);
     await createAlert(dashboardUid,folderUid)
   });

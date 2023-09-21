@@ -14,11 +14,11 @@
         "from": 21600,
         "to": 0
       },
-      "datasourceUid": "prometheus",
+      "datasourceUid": "Prometheus",
       "model": {
         "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
+          "type": "Prometheus",
+          "uid": "Prometheus"
         },
         "editorMode": "code",
         "exemplar": true,
