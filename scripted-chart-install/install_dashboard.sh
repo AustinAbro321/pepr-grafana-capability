@@ -11,11 +11,11 @@ curl \
   -d @$SCRIPT_DIR/../folder.json https://grafana.bigbang.dev/api/folders
 
 
-# curl \
-#   -X POST \
-#   -H "Authorization: Bearer $TOKEN" \
-#   -H "Content-Type: application/json" \
-#   -d @$SCRIPT_DIR/metric.json https://grafana.bigbang.dev/api/dashboards/db
+curl \
+  -X POST \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d @$SCRIPT_DIR/metric.json https://grafana.bigbang.dev/api/dashboards/db
 
 # curl \
 #   -X GET \

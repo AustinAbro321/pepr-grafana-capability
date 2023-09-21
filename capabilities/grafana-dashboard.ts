@@ -18,6 +18,7 @@ export const Grafana = new Capability({
 
 const { When } = Grafana;
 const decode = (str: string):string => Buffer.from(str, 'base64').toString('binary');
+const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
 
 
 export async function getGrafanaApiKey() : Promise<string> {
@@ -26,8 +27,24 @@ export async function getGrafanaApiKey() : Promise<string> {
   kc.loadFromDefault();
   const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
   
-  const response = await k8sCoreApi.readNamespacedSecret("grafana-admin-api-key","admin-ns-devs-do-not-access");
+  // const response = await k8sCoreApi.readNamespacedSecret("grafana-admin-api-key","admin-ns-devs-do-not-access");
+  const response = await k8sCoreApi.readNamespacedSecret("monitoring","admin-ns-devs-do-not-access")
   return decode(response.body.data.value)
+}
+
+export async function getGrafanaAuthHeader() : Promise<string> {
+  //Future enhancement could be creating api key on the fly if the API allows it
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+  const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
+  
+  // const response = await k8sCoreApi.readNamespacedSecret("grafana-admin-api-key","admin-ns-devs-do-not-access");
+  const response = await k8sCoreApi.readNamespacedSecret("monitoring-grafana","monitoring")
+  const adminPassword = decode(response.body.data["admin-password"])
+  const adminUsername = decode(response.body.data["admin-user"])
+  const authHeader = "Basic " + encode(`${adminUsername}:${adminPassword}`)
+  console.log(authHeader)
+  return authHeader
 }
 
 function generateRandomString(length: number): string {
@@ -68,20 +85,47 @@ interface GrafanaFolderData {
   title: string;
 }
 
-type GrafanaFolderDataArr = GrafanaFolderData[]
+export type GrafanaFolderDataArr = GrafanaFolderData[]
 
-export async function getFoldersGrafanaApi(){
-  const apiKey = await getGrafanaApiKey();
-  return fetch<GrafanaFolderDataArr>(
-    "https://grafana.bigbang.dev/api/folders",
-    { 
-      method: 'GET', 
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
+export async function grafanaApiCall<T>(method: string, path: string, body: string = null): Promise<FetchResponse<T>> {
+  try{
+    const response = await fetch<T>(
+      `https://grafana.bigbang.dev/${path}`,
+      { 
+        method: `${method}`, 
+        headers: {
+          'Authorization': `${await getGrafanaAuthHeader()}`,
+          'Content-Type': 'application/json',
+        },
+        body: body
+      }
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${JSON.stringify(response)}`);
     }
-  );
+    return response;
+  }
+  catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+
+export async function getFoldersGrafanaApi(): Promise<FetchResponse<GrafanaFolderDataArr>> {
+  try{
+    return fetch<GrafanaFolderDataArr>(
+      "https://grafana.bigbang.dev/api/folders",
+      { 
+        method: 'GET', 
+        headers: {
+          'Authorization': `${await getGrafanaAuthHeader()}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  }
+  catch (error) {
+    console.error('Error fetching data:', error);
+  }
 }
 
 export async function createFolder(namespaceName: string, createFolderApiCall: Function,
