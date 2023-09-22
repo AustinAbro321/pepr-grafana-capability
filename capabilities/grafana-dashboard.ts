@@ -199,7 +199,7 @@ When(a.Namespace)
   .WithLabel("pepr.dev/create-grafana-dashboard")
   .Mutate(async change => {
     const namespaceName = change.Raw.metadata.name
-    const teamName = change.Raw.metadata.name
+    const teamName = change.Raw.metadata.labels["pepr.dev/grafana-team-name"]
     const folderUid = await createFolder(namespaceName);
     const teamId = await createTeam(teamName);
     const dashboardUid = await createDashboard(namespaceName,folderUid);
