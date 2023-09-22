@@ -1,3 +1,681 @@
+// const configMapBody = {
+//   apiVersion: 'v1',
+//   data: {
+//     'file.json': 
+//         '{\n' +
+//     '"dashboard": {\n' +
+//     '    "annotations": {\n' +
+//     '      "list": [\n' +
+//     '        {\n' +
+//     '          "builtIn": 1,\n' +
+//     '          "datasource": {\n' +
+//     '            "type": "datasource",\n' +
+//     '            "uid": "grafana"\n' +
+//     '          },\n' +
+//     '          "enable": true,\n' +
+//     '          "hide": true,\n' +
+//     '          "iconColor": "rgba(0, 211, 255, 1)",\n' +
+//     '          "name": "Annotations & Alerts",\n' +
+//     '          "target": {\n' +
+//     '            "limit": 100,\n' +
+//     '            "matchAny": false,\n' +
+//     '            "tags": [],\n' +
+//     '            "type": "dashboard"\n' +
+//     '          },\n' +
+//     '          "type": "dashboard"\n' +
+//     '        }\n' +
+//     '      ]\n' +
+//     '    },\n' +
+//     '    "editable": true,\n' +
+//     '    "fiscalYearStartMonth": 0,\n' +
+//     '    "graphTooltip": 0,\n' +
+//     '    "id": null,\n' +
+//     '    "links": [],\n' +
+//     '    "liveNow": false,\n' +
+//     '    "panels": [\n' +
+//     '      {\n' +
+//     '        "datasource": {\n' +
+//     '          "type": "Prometheus",\n' +
+//     '          "uid": "Prometheus"\n' +
+//     '        },\n' +
+//     '        "description": "",\n' +
+//     '        "fieldConfig": {\n' +
+//     '          "defaults": {\n' +
+//     '            "color": {\n' +
+//     '              "mode": "palette-classic"\n' +
+//     '            },\n' +
+//     '            "custom": {\n' +
+//     '              "axisCenteredZero": false,\n' +
+//     '              "axisColorMode": "text",\n' +
+//     '              "axisLabel": "% of CPU Limit Used",\n' +
+//     '              "axisPlacement": "auto",\n' +
+//     '              "barAlignment": 0,\n' +
+//     '              "drawStyle": "line",\n' +
+//     '              "fillOpacity": 0,\n' +
+//     '              "gradientMode": "none",\n' +
+//     '              "hideFrom": {\n' +
+//     '                "legend": false,\n' +
+//     '                "tooltip": false,\n' +
+//     '                "viz": false\n' +
+//     '              },\n' +
+//     '              "lineInterpolation": "linear",\n' +
+//     '              "lineWidth": 1,\n' +
+//     '              "pointSize": 5,\n' +
+//     '              "scaleDistribution": {\n' +
+//     '                "type": "linear"\n' +
+//     '              },\n' +
+//     '              "showPoints": "auto",\n' +
+//     '              "spanNulls": false,\n' +
+//     '              "stacking": {\n' +
+//     '                "group": "A",\n' +
+//     '                "mode": "none"\n' +
+//     '              },\n' +
+//     '              "thresholdsStyle": {\n' +
+//     '                "mode": "off"\n' +
+//     '              }\n' +
+//     '            },\n' +
+//     '            "mappings": [],\n' +
+//     '            "thresholds": {\n' +
+//     '              "mode": "absolute",\n' +
+//     '              "steps": [\n' +
+//     '                {\n' +
+//     '                  "color": "green",\n' +
+//     '                  "value": null\n' +
+//     '                },\n' +
+//     '                {\n' +
+//     '                  "color": "red",\n' +
+//     '                  "value": 80\n' +
+//     '                }\n' +
+//     '              ]\n' +
+//     '            },\n' +
+//     '            "unit": "percent"\n' +
+//     '          },\n' +
+//     '          "overrides": []\n' +
+//     '        },\n' +
+//     '        "gridPos": {\n' +
+//     '          "h": 9,\n' +
+//     '          "w": 12,\n' +
+//     '          "x": 0,\n' +
+//     '          "y": 0\n' +
+//     '        },\n' +
+//     '        "id": 2,\n' +
+//     '        "options": {\n' +
+//     '          "legend": {\n' +
+//     '            "calcs": [],\n' +
+//     '            "displayMode": "list",\n' +
+//     '            "placement": "bottom",\n' +
+//     '            "showLegend": true\n' +
+//     '          },\n' +
+//     '          "tooltip": {\n' +
+//     '            "mode": "single",\n' +
+//     '            "sort": "none"\n' +
+//     '          }\n' +
+//     '        },\n' +
+//     '        "targets": [\n' +
+//     '          {\n' +
+//     '            "datasource": {\n' +
+//     '              "type": "Prometheus",\n' +
+//     '              "uid": "Prometheus"\n' +
+//     '            },\n' +
+//     '            "editorMode": "code",\n' +
+//     '            "exemplar": true,\n' +
+//     '            "expr": "(sum(rate(container_cpu_usage_seconds_total{namespace=~\"${Namespace}\",container!=\"POD\",container!=\"istio-proxy\"}[5m])) by (namespace,container) / sum(kube_pod_container_resource_limits{resource=\"cpu\",namespace=~\"${Namespace}\",container!=\"POD\",container!=\"istio-proxy\"}) by (namespace,container) ) * 100",\n' +
+//     '            "interval": "",\n' +
+//     '            "legendFormat": "{container:{{container}}, pod:{{pod}}, namespace:{{namespace}} }",\n' +
+//     '            "range": true,\n' +
+//     '            "refId": "A"\n' +
+//     '          }\n' +
+//     '        ],\n' +
+//     '        "title": "% of CPU Limit Used by Containers (Over Time)",\n' +
+//     '        "type": "timeseries"\n' +
+//     '      },\n' +
+//     '      {\n' +
+//     '        "datasource": {\n' +
+//     '          "type": "Prometheus",\n' +
+//     '          "uid": "Prometheus"\n' +
+//     '        },\n' +
+//     '        "fieldConfig": {\n' +
+//     '          "defaults": {\n' +
+//     '            "color": {\n' +
+//     '              "mode": "palette-classic"\n' +
+//     '            },\n' +
+//     '            "custom": {\n' +
+//     '              "axisCenteredZero": false,\n' +
+//     '              "axisColorMode": "text",\n' +
+//     '              "axisLabel": "% Memory Limit Used",\n' +
+//     '              "axisPlacement": "auto",\n' +
+//     '              "barAlignment": 0,\n' +
+//     '              "drawStyle": "line",\n' +
+//     '              "fillOpacity": 0,\n' +
+//     '              "gradientMode": "none",\n' +
+//     '              "hideFrom": {\n' +
+//     '                "legend": false,\n' +
+//     '                "tooltip": false,\n' +
+//     '                "viz": false\n' +
+//     '              },\n' +
+//     '              "lineInterpolation": "linear",\n' +
+//     '              "lineWidth": 1,\n' +
+//     '              "pointSize": 5,\n' +
+//     '              "scaleDistribution": {\n' +
+//     '                "type": "linear"\n' +
+//     '              },\n' +
+//     '              "showPoints": "auto",\n' +
+//     '              "spanNulls": false,\n' +
+//     '              "stacking": {\n' +
+//     '                "group": "A",\n' +
+//     '                "mode": "none"\n' +
+//     '              },\n' +
+//     '              "thresholdsStyle": {\n' +
+//     '                "mode": "off"\n' +
+//     '              }\n' +
+//     '            },\n' +
+//     '            "mappings": [],\n' +
+//     '            "thresholds": {\n' +
+//     '              "mode": "absolute",\n' +
+//     '              "steps": [\n' +
+//     '                {\n' +
+//     '                  "color": "green",\n' +
+//     '                  "value": null\n' +
+//     '                },\n' +
+//     '                {\n' +
+//     '                  "color": "red",\n' +
+//     '                  "value": 80\n' +
+//     '                }\n' +
+//     '              ]\n' +
+//     '            },\n' +
+//     '            "unit": "percent"\n' +
+//     '          },\n' +
+//     '          "overrides": []\n' +
+//     '        },\n' +
+//     '        "gridPos": {\n' +
+//     '          "h": 9,\n' +
+//     '          "w": 12,\n' +
+//     '          "x": 12,\n' +
+//     '          "y": 0\n' +
+//     '        },\n' +
+//     '        "id": 4,\n' +
+//     '        "options": {\n' +
+//     '          "legend": {\n' +
+//     '            "calcs": [],\n' +
+//     '            "displayMode": "list",\n' +
+//     '            "placement": "bottom",\n' +
+//     '            "showLegend": true\n' +
+//     '          },\n' +
+//     '          "tooltip": {\n' +
+//     '            "mode": "single",\n' +
+//     '            "sort": "none"\n' +
+//     '          }\n' +
+//     '        },\n' +
+//     '        "targets": [\n' +
+//     '          {\n' +
+//     '            "datasource": {\n' +
+//     '              "type": "Prometheus",\n' +
+//     '              "uid": "Prometheus"\n' +
+//     '            },\n' +
+//     '            "editorMode": "code",\n' +
+//     '            "exemplar": true,\n' +
+//     '            "expr": "(sum(container_memory_max_usage_bytes{namespace=~\"${Namespace}\",container!=\"POD\",container!=\"istio-proxy\"}) by (namespace,container) / sum(kube_pod_container_resource_limits{resource=\"memory\",namespace=~\"${Namespace}\",container!=\"POD\",container!=\"istio-proxy\"}) by (namespace,container))*100",\n' +
+//     '            "interval": "",\n' +
+//     '            "legendFormat": "{container:{{container}}, pod:{{pod}}, namespace:{{namespace}} }",\n' +
+//     '            "range": true,\n' +
+//     '            "refId": "A"\n' +
+//     '          }\n' +
+//     '        ],\n' +
+//     '        "title": "% of Memory Limit Used by Containers (Over Time)",\n' +
+//     '        "type": "timeseries"\n' +
+//     '      },\n' +
+//     '      {\n' +
+//     '        "datasource": {\n' +
+//     '          "type": "Prometheus",\n' +
+//     '          "uid": "Prometheus"\n' +
+//     '        },\n' +
+//     '        "fieldConfig": {\n' +
+//     '          "defaults": {\n' +
+//     '            "color": {\n' +
+//     '              "mode": "palette-classic"\n' +
+//     '            },\n' +
+//     '            "custom": {\n' +
+//     '              "axisCenteredZero": false,\n' +
+//     '              "axisColorMode": "text",\n' +
+//     '              "axisLabel": "Bytes",\n' +
+//     '              "axisPlacement": "auto",\n' +
+//     '              "barAlignment": 0,\n' +
+//     '              "drawStyle": "line",\n' +
+//     '              "fillOpacity": 0,\n' +
+//     '              "gradientMode": "none",\n' +
+//     '              "hideFrom": {\n' +
+//     '                "legend": false,\n' +
+//     '                "tooltip": false,\n' +
+//     '                "viz": false\n' +
+//     '              },\n' +
+//     '              "lineInterpolation": "linear",\n' +
+//     '              "lineWidth": 1,\n' +
+//     '              "pointSize": 5,\n' +
+//     '              "scaleDistribution": {\n' +
+//     '                "type": "linear"\n' +
+//     '              },\n' +
+//     '              "showPoints": "auto",\n' +
+//     '              "spanNulls": false,\n' +
+//     '              "stacking": {\n' +
+//     '                "group": "A",\n' +
+//     '                "mode": "none"\n' +
+//     '              },\n' +
+//     '              "thresholdsStyle": {\n' +
+//     '                "mode": "off"\n' +
+//     '              }\n' +
+//     '            },\n' +
+//     '            "mappings": [],\n' +
+//     '            "thresholds": {\n' +
+//     '              "mode": "absolute",\n' +
+//     '              "steps": [\n' +
+//     '                {\n' +
+//     '                  "color": "green",\n' +
+//     '                  "value": null\n' +
+//     '                },\n' +
+//     '                {\n' +
+//     '                  "color": "red",\n' +
+//     '                  "value": 80\n' +
+//     '                }\n' +
+//     '              ]\n' +
+//     '            },\n' +
+//     '            "unit": "decbytes"\n' +
+//     '          },\n' +
+//     '          "overrides": []\n' +
+//     '        },\n' +
+//     '        "gridPos": {\n' +
+//     '          "h": 8,\n' +
+//     '          "w": 12,\n' +
+//     '          "x": 0,\n' +
+//     '          "y": 17\n' +
+//     '        },\n' +
+//     '        "id": 8,\n' +
+//     '        "options": {\n' +
+//     '          "legend": {\n' +
+//     '            "calcs": [],\n' +
+//     '            "displayMode": "list",\n' +
+//     '            "placement": "bottom",\n' +
+//     '            "showLegend": true\n' +
+//     '          },\n' +
+//     '          "tooltip": {\n' +
+//     '            "mode": "single",\n' +
+//     '            "sort": "none"\n' +
+//     '          }\n' +
+//     '        },\n' +
+//     '        "targets": [\n' +
+//     '          {\n' +
+//     '            "datasource": {\n' +
+//     '              "type": "Prometheus",\n' +
+//     '              "uid": "Prometheus"\n' +
+//     '            },\n' +
+//     '            "editorMode": "code",\n' +
+//     '            "exemplar": true,\n' +
+//     '            "expr": "container_fs_reads_bytes_total{namespace=~\"${Namespace}\",container!=\"POD\",container!=\"istio-proxy\"}",\n' +
+//     '            "interval": "",\n' +
+//     '            "legendFormat": "{container:{{container}}, pod:{{pod}}, namespace:{{namespace}} }",\n' +
+//     '            "range": true,\n' +
+//     '            "refId": "A"\n' +
+//     '          }\n' +
+//     '        ],\n' +
+//     '        "title": "File System Reads by Container (Over Time)",\n' +
+//     '        "type": "timeseries"\n' +
+//     '      },\n' +
+//     '      {\n' +
+//     '        "datasource": {\n' +
+//     '          "type": "Prometheus",\n' +
+//     '          "uid": "Prometheus"\n' +
+//     '        },\n' +
+//     '        "fieldConfig": {\n' +
+//     '          "defaults": {\n' +
+//     '            "color": {\n' +
+//     '              "mode": "palette-classic"\n' +
+//     '            },\n' +
+//     '            "custom": {\n' +
+//     '              "axisCenteredZero": false,\n' +
+//     '              "axisColorMode": "text",\n' +
+//     '              "axisLabel": "Bytes",\n' +
+//     '              "axisPlacement": "auto",\n' +
+//     '              "barAlignment": 0,\n' +
+//     '              "drawStyle": "line",\n' +
+//     '              "fillOpacity": 0,\n' +
+//     '              "gradientMode": "none",\n' +
+//     '              "hideFrom": {\n' +
+//     '                "legend": false,\n' +
+//     '                "tooltip": false,\n' +
+//     '                "viz": false\n' +
+//     '              },\n' +
+//     '              "lineInterpolation": "linear",\n' +
+//     '              "lineWidth": 1,\n' +
+//     '              "pointSize": 5,\n' +
+//     '              "scaleDistribution": {\n' +
+//     '                "type": "linear"\n' +
+//     '              },\n' +
+//     '              "showPoints": "auto",\n' +
+//     '              "spanNulls": false,\n' +
+//     '              "stacking": {\n' +
+//     '                "group": "A",\n' +
+//     '                "mode": "none"\n' +
+//     '              },\n' +
+//     '              "thresholdsStyle": {\n' +
+//     '                "mode": "off"\n' +
+//     '              }\n' +
+//     '            },\n' +
+//     '            "mappings": [],\n' +
+//     '            "thresholds": {\n' +
+//     '              "mode": "absolute",\n' +
+//     '              "steps": [\n' +
+//     '                {\n' +
+//     '                  "color": "green",\n' +
+//     '                  "value": null\n' +
+//     '                },\n' +
+//     '                {\n' +
+//     '                  "color": "red",\n' +
+//     '                  "value": 80\n' +
+//     '                }\n' +
+//     '              ]\n' +
+//     '            },\n' +
+//     '            "unit": "decbytes"\n' +
+//     '          },\n' +
+//     '          "overrides": []\n' +
+//     '        },\n' +
+//     '        "gridPos": {\n' +
+//     '          "h": 8,\n' +
+//     '          "w": 12,\n' +
+//     '          "x": 12,\n' +
+//     '          "y": 17\n' +
+//     '        },\n' +
+//     '        "id": 10,\n' +
+//     '        "options": {\n' +
+//     '          "legend": {\n' +
+//     '            "calcs": [],\n' +
+//     '            "displayMode": "list",\n' +
+//     '            "placement": "bottom",\n' +
+//     '            "showLegend": true\n' +
+//     '          },\n' +
+//     '          "tooltip": {\n' +
+//     '            "mode": "single",\n' +
+//     '            "sort": "none"\n' +
+//     '          }\n' +
+//     '        },\n' +
+//     '        "targets": [\n' +
+//     '          {\n' +
+//     '            "datasource": {\n' +
+//     '              "type": "Prometheus",\n' +
+//     '              "uid": "Prometheus"\n' +
+//     '            },\n' +
+//     '            "editorMode": "code",\n' +
+//     '            "exemplar": true,\n' +
+//     '            "expr": "rate(container_fs_writes_bytes_total{namespace=~\"${Namespace}\",container!=\"POD\",container!=\"istio-proxy\"}[5m])",\n' +
+//     '            "interval": "",\n' +
+//     '            "legendFormat": "{container:{{container}}, pod:{{pod}}, namespace:{{namespace}} }",\n' +
+//     '            "range": true,\n' +
+//     '            "refId": "A"\n' +
+//     '          }\n' +
+//     '        ],\n' +
+//     '        "title": "File System Writes by Container (Over Time)",\n' +
+//     '        "type": "timeseries"\n' +
+//     '      },\n' +
+//     '      {\n' +
+//     '        "datasource": {\n' +
+//     '          "type": "Prometheus",\n' +
+//     '          "uid": "Prometheus"\n' +
+//     '        },\n' +
+//     '        "fieldConfig": {\n' +
+//     '          "defaults": {\n' +
+//     '            "color": {\n' +
+//     '              "mode": "palette-classic"\n' +
+//     '            },\n' +
+//     '            "custom": {\n' +
+//     '              "axisCenteredZero": false,\n' +
+//     '              "axisColorMode": "text",\n' +
+//     '              "axisLabel": "Bytes",\n' +
+//     '              "axisPlacement": "auto",\n' +
+//     '              "barAlignment": 0,\n' +
+//     '              "drawStyle": "line",\n' +
+//     '              "fillOpacity": 0,\n' +
+//     '              "gradientMode": "none",\n' +
+//     '              "hideFrom": {\n' +
+//     '                "legend": false,\n' +
+//     '                "tooltip": false,\n' +
+//     '                "viz": false\n' +
+//     '              },\n' +
+//     '              "lineInterpolation": "linear",\n' +
+//     '              "lineWidth": 1,\n' +
+//     '              "pointSize": 5,\n' +
+//     '              "scaleDistribution": {\n' +
+//     '                "type": "linear"\n' +
+//     '              },\n' +
+//     '              "showPoints": "auto",\n' +
+//     '              "spanNulls": false,\n' +
+//     '              "stacking": {\n' +
+//     '                "group": "A",\n' +
+//     '                "mode": "none"\n' +
+//     '              },\n' +
+//     '              "thresholdsStyle": {\n' +
+//     '                "mode": "off"\n' +
+//     '              }\n' +
+//     '            },\n' +
+//     '            "mappings": [],\n' +
+//     '            "thresholds": {\n' +
+//     '              "mode": "absolute",\n' +
+//     '              "steps": [\n' +
+//     '                {\n' +
+//     '                  "color": "green",\n' +
+//     '                  "value": null\n' +
+//     '                },\n' +
+//     '                {\n' +
+//     '                  "color": "red",\n' +
+//     '                  "value": 80\n' +
+//     '                }\n' +
+//     '              ]\n' +
+//     '            },\n' +
+//     '            "unit": "decbytes"\n' +
+//     '          },\n' +
+//     '          "overrides": []\n' +
+//     '        },\n' +
+//     '        "gridPos": {\n' +
+//     '          "h": 8,\n' +
+//     '          "w": 12,\n' +
+//     '          "x": 0,\n' +
+//     '          "y": 25\n' +
+//     '        },\n' +
+//     '        "id": 12,\n' +
+//     '        "options": {\n' +
+//     '          "legend": {\n' +
+//     '            "calcs": [],\n' +
+//     '            "displayMode": "list",\n' +
+//     '            "placement": "bottom",\n' +
+//     '            "showLegend": true\n' +
+//     '          },\n' +
+//     '          "tooltip": {\n' +
+//     '            "mode": "single",\n' +
+//     '            "sort": "none"\n' +
+//     '          }\n' +
+//     '        },\n' +
+//     '        "targets": [\n' +
+//     '          {\n' +
+//     '            "datasource": {\n' +
+//     '              "type": "Prometheus",\n' +
+//     '              "uid": "Prometheus"\n' +
+//     '            },\n' +
+//     '            "editorMode": "code",\n' +
+//     '            "exemplar": true,\n' +
+//     '            "expr": "rate(container_network_receive_bytes_total{namespace=~\"${Namespace}\"}[5m])",\n' +
+//     '            "interval": "",\n' +
+//     '            "legendFormat": "{container:{{container}}, pod:{{pod}}, namespace:{{namespace}} }",\n' +
+//     '            "range": true,\n' +
+//     '            "refId": "A"\n' +
+//     '          }\n' +
+//     '        ],\n' +
+//     '        "title": "Container Network Bytes Received (Over Time)",\n' +
+//     '        "type": "timeseries"\n' +
+//     '      },\n' +
+//     '      {\n' +
+//     '        "datasource": {\n' +
+//     '          "type": "Prometheus",\n' +
+//     '          "uid": "Prometheus"\n' +
+//     '        },\n' +
+//     '        "fieldConfig": {\n' +
+//     '          "defaults": {\n' +
+//     '            "color": {\n' +
+//     '              "mode": "palette-classic"\n' +
+//     '            },\n' +
+//     '            "custom": {\n' +
+//     '              "axisCenteredZero": false,\n' +
+//     '              "axisColorMode": "text",\n' +
+//     '              "axisLabel": "Bytes",\n' +
+//     '              "axisPlacement": "auto",\n' +
+//     '              "barAlignment": 0,\n' +
+//     '              "drawStyle": "line",\n' +
+//     '              "fillOpacity": 0,\n' +
+//     '              "gradientMode": "none",\n' +
+//     '              "hideFrom": {\n' +
+//     '                "legend": false,\n' +
+//     '                "tooltip": false,\n' +
+//     '                "viz": false\n' +
+//     '              },\n' +
+//     '              "lineInterpolation": "linear",\n' +
+//     '              "lineWidth": 1,\n' +
+//     '              "pointSize": 5,\n' +
+//     '              "scaleDistribution": {\n' +
+//     '                "type": "linear"\n' +
+//     '              },\n' +
+//     '              "showPoints": "auto",\n' +
+//     '              "spanNulls": false,\n' +
+//     '              "stacking": {\n' +
+//     '                "group": "A",\n' +
+//     '                "mode": "none"\n' +
+//     '              },\n' +
+//     '              "thresholdsStyle": {\n' +
+//     '                "mode": "off"\n' +
+//     '              }\n' +
+//     '            },\n' +
+//     '            "mappings": [],\n' +
+//     '            "thresholds": {\n' +
+//     '              "mode": "absolute",\n' +
+//     '              "steps": [\n' +
+//     '                {\n' +
+//     '                  "color": "green",\n' +
+//     '                  "value": null\n' +
+//     '                },\n' +
+//     '                {\n' +
+//     '                  "color": "red",\n' +
+//     '                  "value": 80\n' +
+//     '                }\n' +
+//     '              ]\n' +
+//     '            },\n' +
+//     '            "unit": "decbytes"\n' +
+//     '          },\n' +
+//     '          "overrides": []\n' +
+//     '        },\n' +
+//     '        "gridPos": {\n' +
+//     '          "h": 8,\n' +
+//     '          "w": 12,\n' +
+//     '          "x": 12,\n' +
+//     '          "y": 25\n' +
+//     '        },\n' +
+//     '        "id": 14,\n' +
+//     '        "options": {\n' +
+//     '          "legend": {\n' +
+//     '            "calcs": [],\n' +
+//     '            "displayMode": "list",\n' +
+//     '            "placement": "bottom",\n' +
+//     '            "showLegend": true\n' +
+//     '          },\n' +
+//     '          "tooltip": {\n' +
+//     '            "mode": "single",\n' +
+//     '            "sort": "none"\n' +
+//     '          }\n' +
+//     '        },\n' +
+//     '        "targets": [\n' +
+//     '          {\n' +
+//     '            "datasource": {\n' +
+//     '              "type": "Prometheus",\n' +
+//     '              "uid": "Prometheus"\n' +
+//     '            },\n' +
+//     '            "editorMode": "code",\n' +
+//     '            "exemplar": true,\n' +
+//     '            "expr": "rate(container_network_transmit_bytes_total{namespace=~\"${Namespace}\"}[5m])",\n' +
+//     '            "interval": "",\n' +
+//     '            "legendFormat": "{container:{{container}}, pod:{{pod}}, namespace:{{namespace}} }",\n' +
+//     '            "range": true,\n' +
+//     '            "refId": "A"\n' +
+//     '          }\n' +
+//     '        ],\n' +
+//     '        "title": "Container Network Bytes Transmitted (Over Time)",\n' +
+//     '        "type": "timeseries"\n' +
+//     '      }\n' +
+//     '    ],\n' +
+//     '    "schemaVersion": 37,\n' +
+//     '    "style": "dark",\n' +
+//     '    "tags": [],\n' +
+//     '    "templating": {\n' +
+//     '      "list": [\n' +
+//     '        {\n' +
+//     '          "allValue": "example-namespace-name",\n' +
+//     '          "current": {\n' +
+//     '            "selected": false,\n' +
+//     '            "text": [\n' +
+//     '              "All"\n' +
+//     '            ],\n' +
+//     '            "value": [\n' +
+//     '              "$__all"\n' +
+//     '            ]\n' +
+//     '          },\n' +
+//     '          "description": "For selecting which namespaces to display metrics for",\n' +
+//     '          "hide": 0,\n' +
+//     '          "includeAll": true,\n' +
+//     '          "label": "Environment",\n' +
+//     '          "multi": true,\n' +
+//     '          "name": "Namespace",\n' +
+//     '          "options": [\n' +
+//     '            {\n' +
+//     '              "selected": true,\n' +
+//     '              "text": "All",\n' +
+//     '              "value": "$__all"\n' +
+//     '            },\n' +
+//     '            {\n' +
+//     '              "selected": false,\n' +
+//     '              "text": "example-namespace-name",\n' +
+//     '              "value": "example-namespace-name"\n' +
+//     '            }\n' +
+//     '          ],\n' +
+//     '          "query": "example-namespace-name",\n' +
+//     '          "queryValue": "",\n' +
+//     '          "skipUrlSync": false,\n' +
+//     '          "type": "custom"\n' +
+//     '        }\n' +
+//     '      ]\n' +
+//     '    },\n' +
+//     '    "time": {\n' +
+//     '      "from": "now-6h",\n' +
+//     '      "to": "now"\n' +
+//     '    },\n' +
+//     '    "timepicker": {},\n' +
+//     '    "timezone": "",\n' +
+//     '    "title": "Hello World Performance Metrics",\n' +
+//     '    "uid": "UTgkvtNVk15",\n' +
+//     '    "version": 5,\n' +
+//     '    "weekStart": ""\n' +
+//     '  },\n' +
+//     '  "folderUid": "replace",\n' +
+//     '  "overwrite": true\n' +
+//     '}\n'
+//   },
+//   immutable: undefined,
+//   kind: 'ConfigMap',
+//   metadata: {
+//     name: 'metric-dashboard',
+//     namespace: 'monitoring',
+//   }
+// }
+
+// export async function createMetricDashboardConfigMap(){
+//   const kc = new k8s.KubeConfig();
+//   kc.loadFromDefault();
+//   const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
+//   console.log(k8sCoreApi.createNamespacedConfigMap("monitoring",configMapBody))
+// }
+
 import {
   Capability,
   a,
@@ -13,7 +691,12 @@ import { FetchResponse } from "pepr/dist/lib/fetch";
 
 export const Grafana = new Capability({
   name: "grafana",
-  description: "A simple example capability to show how things work."
+  description: `This module is meant to be used by 
+    platform teams who stand up the same dashboards for every app teams 
+    on their platforms. Utlizing this capability allows them to 
+    create a folder, a team with permissions to that folder, a dashboard and alerts. 
+    Could also be extended to create and configure notifications 
+   `
 });
 
 const { When } = Grafana;
@@ -21,15 +704,12 @@ const decode = (str: string):string => Buffer.from(str, 'base64').toString('bina
 const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
 
 
-export async function getGrafanaApiKey() : Promise<string> {
-  //Future enhancement could be creating api key on the fly if the API allows it
+export async function getJsonFileFromConfigMap(configmapName: string) {
   const kc = new k8s.KubeConfig();
   kc.loadFromDefault();
   const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
-  
-  // const response = await k8sCoreApi.readNamespacedSecret("grafana-admin-api-key","admin-ns-devs-do-not-access");
-  const response = await k8sCoreApi.readNamespacedSecret("monitoring","admin-ns-devs-do-not-access")
-  return decode(response.body.data.value)
+  const response = await k8sCoreApi.readNamespacedConfigMap(configmapName,"monitoring")
+  return JSON.parse(response.body.data["file.json"])
 }
 
 export async function getGrafanaAuthHeader() : Promise<string> {
@@ -97,10 +777,13 @@ export async function grafanaApiCall<T>(method: string, path: string, body: stri
 
 export async function createFolder(namespaceName: string, createFolderApiCall: Function = grafanaApiCall<GrafanaFolderData>,
   getFoldersApiCall: Function = grafanaApiCall<GrafanaFolderDataArr>) : Promise<string> {
-  const folderJson = getJsonFile("folder.json")
+  const folderJson = {
+    "uid": "example-uid",
+    "title": "example-team"
+  };
   const folderUid = generateRandomString(12)
   folderJson.title = `${namespaceName}`
-  folderJson.Uid = folderUid
+  folderJson.uid = folderUid
 
   const folderJsonString = JSON.stringify(folderJson);
   const folderResponse = await createFolderApiCall("POST","api/folders",folderJsonString);
@@ -125,7 +808,8 @@ interface GrafanaDashboardReturn {
 
 export async function createDashboard(namespaceName: string,folderUid: string,
   callCreateDashboardApi: Function = grafanaApiCall<GrafanaFolderDataArr>) : Promise<string> {
-  const metricJson = getJsonFile("metric.json")
+  // const metricJson = getJsonFile("metric.json")
+  const metricJson = await getJsonFileFromConfigMap("metric-dashboard")
   const dashboardUid = generateRandomString(12)
 
   // Future enhancement get the number of namespaces with the same team or same dashboard enabled
@@ -148,7 +832,7 @@ export async function createDashboard(namespaceName: string,folderUid: string,
 }
 
 export async function createAlert(dashboardUid: string,folderUid: string,dataSourceUid: string){
-  const alertJson = getJsonFile("alert.json")
+  const alertJson = await getJsonFileFromConfigMap("alert-dashboard")
 
   const alertUid = generateRandomString(12);
   alertJson.annotations.__dashboardUid__ = dashboardUid;
