@@ -684,8 +684,6 @@ import {
 } from "pepr";
 
 import { Buffer } from "buffer";
-import * as fs from 'fs';
-import * as path from 'path';
 import { FetchResponse } from "pepr/dist/lib/fetch";
 
 
