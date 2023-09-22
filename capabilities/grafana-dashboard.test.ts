@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import {createFolder,createDashboard} from './grafana-dashboard';
+import {createFolder,createDashboard, createTeam} from './grafana-dashboard';
 
 
 function getFoldersFakeApiCall() {
@@ -74,4 +74,72 @@ test("create dashboard", async () =>{
 //   status: 200,
 //   statusText: 'OK'
 // }
+
+
+
+function createTeamApiCallHappyPath(method: string, path: string){
+  if (method == "POST" && path == "api/teams"){
+    return {
+      data: { message: 'Team created', teamId: 2 },
+      ok: true,
+      status: 200,
+      statusText: 'OK'
+    }
+  }
+}
+
+test('Create team happy path', async () => {
+  expect(await createTeam("good-team",createTeamApiCallHappyPath)).toBe(2);
+});
+
+function getTeamFakeApiCall() {
+  return {
+    "data": {
+      "totalCount": 1,
+      "teams": [
+        {
+          "id": 3,
+          "orgId": 1,
+          "name": "hello-world",
+          "email": "",
+          "avatarUrl": "/avatar/1c1da73064c5aadc4652d601e1f17aa7",
+          "memberCount": 1,
+          "permission": 0,
+          "accessControl": null
+        }
+      ],
+      "page": 1,
+      "perPage": 1000
+    },
+    "ok": true,
+    "status": 200,
+  }
+}
+
+function createTeamConflict(method: string, path: string){
+  if (method == "POST" && path == "api/teams"){
+    return { status: 409, statusText: 'Conflict' }
+  }
+  if (method == "GET" && path == `api/teams/search?name=team-already-exists`){
+    return {
+      "data": {
+        "teams": [
+          {
+            "id": 3,
+            "orgId": 1,
+            "name": "team-already-exists",
+          }
+        ]
+      }
+    }
+  }
+}
+
+test('Create team conflict', async () => {
+  expect(await createTeam("team-already-exists",createTeamConflict)).toBe(3);
+});
+
+// test('Create team that already exists', async () => {
+//   expect(await createTeam("team-that-already-exists",createFolderThatAlreadyExists,getFoldersFakeApiCall)).toBe("uid-that-we-want");
+// });
 

@@ -146,8 +146,6 @@ export async function createDashboard(namespaceName: string,folderUid: string,
   return metricResponse.data.uid
 }
 
-
-
 export async function createAlert(dashboardUid: string,folderUid: string){
   const alertJson = getJsonFile("alert.json")
 
@@ -161,13 +159,37 @@ export async function createAlert(dashboardUid: string,folderUid: string){
   console.log(alertResponse)
 }
 
+interface GrafanaTeam {
+  message: string;
+  teamId: number;
+}
+
+export async function createTeam(teamName: string, apiCall: Function = grafanaApiCall<GrafanaTeam>) : Promise<number> {
+  const team = {
+    name: teamName,
+    orgId: "1"
+  };
+  const teamJsonString = JSON.stringify(team);
+  const createTeamResponse = await apiCall("POST","api/teams",teamJsonString)
+  if (createTeamResponse.ok){
+    return createTeamResponse.data.teamId
+  }
+  if (createTeamResponse.status == 409){
+    const getTeams = await apiCall("GET",`api/teams/search?name=${teamName}`)
+    return getTeams.data.teams[0].id
+  }
+  return -1;
+}
+
 
 When(a.Namespace)
   .IsCreatedOrUpdated()
-  .WithLabel("pepr.io/create-grafana-dashboard")
+  .WithLabel("pepr.dev/create-grafana-dashboard")
   .Mutate(async change => {
     const namespaceName = change.Raw.metadata.name
+    const teamName = change.Raw.metadata.name
     const folderUid = await createFolder(namespaceName);
+    const teamId = await createTeam(teamName);
     const dashboardUid = await createDashboard(namespaceName,folderUid);
     await createAlert(dashboardUid,folderUid)
   });

@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import {getGrafanaApiKey, getGrafanaAuthHeader,createAlert, grafanaApiCall, GrafanaFolderDataArr, createFolder} from './grafana-dashboard';
+import {getGrafanaApiKey, getGrafanaAuthHeader,createAlert, grafanaApiCall, GrafanaFolderDataArr, createFolder, createTeam} from './grafana-dashboard';
 
 test("So I don't get an error when I run npm test lol", async () => {
   expect(true).toBe(true)
@@ -9,8 +9,12 @@ test("So I don't get an error when I run npm test lol", async () => {
 //   expect(await getGrafanaApiKey())
 // })
 
-test("create alert", async () => {
-  console.log(await createAlert("lp7GpO0tNNGg","7ua2wAOXdnOu"))
+// test("create alert", async () => {
+//   console.log(await createAlert("lp7GpO0tNNGg","7ua2wAOXdnOu"))
+// })
+
+test("creat team", async () => {
+  console.log(await createTeam("hello-world"))
 })
 
 // {
