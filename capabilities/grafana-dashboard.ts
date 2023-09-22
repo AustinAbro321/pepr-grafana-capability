@@ -717,8 +717,6 @@ export async function getGrafanaAuthHeader() : Promise<string> {
   const kc = new k8s.KubeConfig();
   kc.loadFromDefault();
   const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
-  
-  // const response = await k8sCoreApi.readNamespacedSecret("grafana-admin-api-key","admin-ns-devs-do-not-access");
   const response = await k8sCoreApi.readNamespacedSecret("monitoring-grafana","monitoring")
   const adminPassword = decode(response.body.data["admin-password"])
   const adminUsername = decode(response.body.data["admin-user"])
@@ -735,12 +733,6 @@ function generateRandomString(length: number): string {
   }
 
   return result;
-}
-
-function getJsonFile(filename: string): any {
-  const jsonPath = path.join(__dirname, "..", filename);
-  const jsonData = fs.readFileSync(jsonPath, 'utf8');
-  return JSON.parse(jsonData);
 }
 
 interface GrafanaFolderData {
