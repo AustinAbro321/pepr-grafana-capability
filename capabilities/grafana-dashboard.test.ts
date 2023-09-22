@@ -1,5 +1,5 @@
 import { expect, test } from "@jest/globals";
-import {createFolder,createDashboard, createTeam} from './grafana-dashboard';
+import {createFolder,createDashboard, createTeam, getDataSourceUid} from './grafana-dashboard';
 
 
 function getFoldersFakeApiCall() {
@@ -113,4 +113,23 @@ function createTeamConflict(method: string, path: string){
 
 test('Create team conflict', async () => {
   expect(await createTeam("team-already-exists",createTeamConflict)).toBe(3);
+});
+
+function getDataSourceUidApiCall(method: string, path: string){
+  return {
+    "data": [
+      {
+        "uid": "uid-we-want",
+        "name": "Prometheus",
+      },
+      {
+        "uid": "uid-we-dont-want",
+        "name": "datasource_elastic",
+      }
+    ]
+  }
+}
+
+test('get data source uid', async () => {
+  expect(await getDataSourceUid("Prometheus",getDataSourceUidApiCall)).toBe("uid-we-want");
 });

@@ -1,7 +1,10 @@
 import { expect, test } from "@jest/globals";
 import {getGrafanaApiKey, getGrafanaAuthHeader,createAlert, grafanaApiCall, GrafanaFolderDataArr, createFolder, createTeam, updatePermissions} from './grafana-dashboard';
 
+const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
 test("So I don't get an error when I run npm test lol", async () => {
+  const str = "Basic " + encode(`admin:prom-operator`)
+  console.log(str)
   expect(true).toBe(true)
 })
 
@@ -9,9 +12,9 @@ test("So I don't get an error when I run npm test lol", async () => {
 //   expect(await getGrafanaApiKey())
 // })
 
-// test("create alert", async () => {
-//   console.log(await createAlert("lp7GpO0tNNGg","7ua2wAOXdnOu"))
-// })
+test("create alert", async () => {
+  console.log(await createAlert("h9ZdRJ3rAId6","wzO9xrENKqVk","PBFA97CFB590B2093"))
+})
 
 // test("creat team", async () => {
 //   console.log(await createTeam("hello-world"))

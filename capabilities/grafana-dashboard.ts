@@ -71,7 +71,7 @@ interface GrafanaFolderData {
 
 export type GrafanaFolderDataArr = GrafanaFolderData[]
 
-export async function grafanaApiCall<T>(method: string, path: string, body: string = null): Promise<FetchResponse<T>> {
+export async function grafanaApiCall<T>(method: string, path: string, body: string = null, additionalHeaders = {}): Promise<FetchResponse<T>> {
   try{
     const response = await fetch<T>(
       `https://grafana.bigbang.dev/${path}`,
@@ -80,6 +80,7 @@ export async function grafanaApiCall<T>(method: string, path: string, body: stri
         headers: {
           'Authorization': `${await getGrafanaAuthHeader()}`,
           'Content-Type': 'application/json',
+          ...additionalHeaders
         },
         body: body
       }
@@ -146,17 +147,18 @@ export async function createDashboard(namespaceName: string,folderUid: string,
   return metricResponse.data.uid
 }
 
-export async function createAlert(dashboardUid: string,folderUid: string){
+export async function createAlert(dashboardUid: string,folderUid: string,dataSourceUid: string){
   const alertJson = getJsonFile("alert.json")
 
   const alertUid = generateRandomString(12);
   alertJson.annotations.__dashboardUid__ = dashboardUid;
   alertJson.uid = alertUid;
   alertJson.folderUID = folderUid;
+  alertJson.data[0].datasourceUid = dataSourceUid;
 
   const alertJsonString = JSON.stringify(alertJson);
-  const alertResponse = await grafanaApiCall<GrafanaDashboardReturn>("POST","api/v1/provisioning/alert-rules/",alertJsonString)
-  console.log(alertResponse)
+  const alertResponse = await grafanaApiCall<GrafanaDashboardReturn>("POST","api/v1/provisioning/alert-rules/",alertJsonString,{'x-disable-provenance': 'true'})
+  console.log(`the alert response ${JSON.stringify(alertResponse)}`)
 }
 
 interface GrafanaTeam {
@@ -194,6 +196,12 @@ export async function updatePermissions(folderUid: string, teamId: number,apiCal
   await apiCall("POST",`api/folders/${folderUid}/permissions`,permissionJsonString)
 }
 
+export async function getDataSourceUid(dataSourceName: string, apiCall: Function = grafanaApiCall<GrafanaTeam>){
+  const response = await apiCall("GET",`api/datasources`)
+  const dataSourceEntry = response.data.find(item => item.name === dataSourceName)
+  return dataSourceEntry.uid;
+}
+
 When(a.Namespace)
   .IsCreatedOrUpdated()
   .WithLabel("pepr.dev/create-grafana-dashboard")
@@ -203,6 +211,7 @@ When(a.Namespace)
     const folderUid = await createFolder(namespaceName);
     const teamId = await createTeam(teamName);
     const dashboardUid = await createDashboard(namespaceName,folderUid);
-    await createAlert(dashboardUid,folderUid)
+    const promUid = await getDataSourceUid("Prometheus")
+    await createAlert(dashboardUid,folderUid,promUid)
     await updatePermissions(folderUid,teamId)
   });

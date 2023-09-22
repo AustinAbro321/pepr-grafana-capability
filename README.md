@@ -1,10 +1,7 @@
 # Current Goals
-1. create teams assign those teams folders
 1. Allow users to enter custom dashboards / alerts
 1. Look into SSO integration points
-1. try / catch for API errors
 1. End to end test
-1. Mocking framework
 
 # Pepr Module
 

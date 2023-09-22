@@ -14,7 +14,7 @@
         "from": 21600,
         "to": 0
       },
-      "datasourceUid": "Prometheus",
+      "datasourceUid": "uid-to-be-replaced",      
       "model": {
         "datasource": {
           "type": "Prometheus",
