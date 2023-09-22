@@ -181,6 +181,18 @@ export async function createTeam(teamName: string, apiCall: Function = grafanaAp
   return -1;
 }
 
+export async function updatePermissions(folderUid: string, teamId: number,apiCall: Function = grafanaApiCall<GrafanaTeam>){
+  const permissionsJson = {
+    "items": [
+      {
+        "teamId": teamId,
+        "permission": 2
+      }
+    ]  
+  };
+  const permissionJsonString = JSON.stringify(permissionsJson);
+  await apiCall("POST",`api/folders/${folderUid}/permissions`,permissionJsonString)
+}
 
 When(a.Namespace)
   .IsCreatedOrUpdated()
@@ -192,4 +204,5 @@ When(a.Namespace)
     const teamId = await createTeam(teamName);
     const dashboardUid = await createDashboard(namespaceName,folderUid);
     await createAlert(dashboardUid,folderUid)
+    await updatePermissions(folderUid,teamId)
   });
